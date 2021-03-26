@@ -5,36 +5,37 @@ from timer import Timer
 from dotenv import load_dotenv
 from discord.ext import commands
 
+PURPLE = 10181046
+GREEN = 3066993
+RED = 15158332
+
 load_dotenv()
 
 bot = commands.Bot(command_prefix='!', help_command=None)
-
 timer = Timer()
 
+async def show_message(ctx, title, color):
+    em = discord.Embed(title=title, color=color)
+    await ctx.send(embed=em)
 
 @bot.event
 async def on_ready():
     print('We have logged in as {}'.format(bot.user))
 
 
-@bot.command(name="start", help="Start a pomodoro timer")
+@bot.command(name="start", help="Start a Pomodoro timer")
 async def start_timer(ctx):
-    work_em = discord.Embed(title="Time to start working", color=10181046)
-    await ctx.send(embed=work_em)
+    await show_message(ctx, "Time to start working", PURPLE)
     timer.start()
     while timer.is_running():
         await asyncio.sleep(1)
         timer.tick()
-        if timer.get_ticks() >= timer.get_max_ticks():
-            timer.stop()
-    break_em = discord.Embed(title="Time for a break", color=3066993)
-    await ctx.send(embed=break_em)
+    await show_message(ctx, "Time for a break", GREEN)
 
 
 @bot.command(name="stop", help="Stop the timer")
 async def stop_timer(ctx):
-    stop_em = discord.Embed(title="Timer stopped", color=15158332)
-    await ctx.send(embed=stop_em)
+    await show_message(ctx, "Timer Stopped", RED)
     timer.stop()
 
 
@@ -51,7 +52,7 @@ async def show_help(ctx):
         help_commands[command.name] = command.help
     description = "Bot commands are: {}".format(help_commands)
     show_help_em = discord.Embed(
-        title="A simple Pomodoro timer bot", description=description, color=15158332)
+        title="A simple Pomodoro timer bot", description=description, color=PURPLE)
     await ctx.send(embed=show_help_em)
 
 
